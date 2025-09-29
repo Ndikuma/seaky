@@ -1,0 +1,299 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    <span data-lang="fr">Tableau de Bord du Gestionnaire</span>
+{% endblock %}
+
+{% block content %}
+<div class="bg-gray-100 min-h-screen p-6">
+    <div class="max-w-7xl mx-auto">
+        <h1 class="text-3xl font-bold mb-8 text-gray-900" data-lang="fr">Coopérative : {{ cooperative }}</h1>
+
+        <!-- Cartes de statistiques -->
+        {% if user.role == 'MANAGER' %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
+            <!-- Carte : Nombre de membres -->
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in">
+                <h3 class="text-lg font-semibold text-gray-700" data-lang="fr">Nombre de Membres</h3>
+                <p class="text-3xl font-bold text-blue-600 mt-2">{{ cooperative.members.count }}</p>
+                <p class="text-sm text-gray-500 mt-1" data-lang="fr">Total des membres inscrits</p>
+            </div>
+            <!-- Carte : Total des fournitures de lait -->
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in">
+                <h3 class="text-lg font-semibold text-gray-700" data-lang="fr">Total Fournitures de Lait</h3>
+                <p class="text-3xl font-bold text-green-600 mt-2">{{ total_milk_liters|floatformat:2 }} L</p>
+                <p class="text-sm text-gray-500 mt-1" data-lang="fr">Quantité totale collectée</p>
+            </div>
+
+        </div>
+
+        <!-- Actions du gestionnaire -->
+        <div class="mb-8 flex flex-wrap gap-4">
+            <a href="{% url 'member_create' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-transform hover:scale-105" data-lang="fr">Ajouter un Membre</a>
+            <button type="button" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-transform hover:scale-105" onclick="document.getElementById('milk-supply-modal').classList.remove('hidden')" data-lang="fr">Ajouter une Fourniture de Lait</button>
+            <a href="{% url 'payment_create' %}" class="inline-block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-transform hover:scale-105" data-lang="fr">Traiter un Paiement</a>
+        </div>
+
+        <!-- Modal pour ajouter une fourniture de lait -->
+        <div id="milk-supply-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 flex items-center justify-center hidden z-50">
+            <div class="bg-white rounded-lg p-6 w-full max-w-md animate-slide-in">
+                <h2 class="text-xl font-semibold mb-4 text-gray-900" data-lang="fr">Ajouter une Fourniture de Lait</h2>
+                <form id="milk-supply-form" action="{% url 'milk_supply_create' %}" method="POST">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="member_id" class="block text-sm font-medium text-gray-700" data-lang="fr">ID Membre</label>
+                        <input type="text" id="member_id" name="member_id" placeholder="Entrez l'ID du membre (ex: COO-12345678)" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500" required aria-describedby="member_id-error">
+                        <p id="member_id-error" class="hidden text-red-600 text-sm mt-1" data-lang="fr">ID membre invalide ou non trouvé.</p>
+                        <div id="member-details" class="mt-2 text-sm text-gray-900 hidden">
+                            <p id="member-name" data-lang="fr"></p>
+                            <p id="member-email" data-lang="fr"></p>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label for="supply_date" class="block text-sm font-medium text-gray-700" data-lang="fr">Date de Fourniture</label>
+                        <input type="date" id="supply_date" name="supply_date" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500" required aria-describedby="supply_date-error">
+                        <p id="supply_date-error" class="hidden text-red-600 text-sm mt-1" data-lang="fr">Veuillez entrer une date valide.</p>
+                    </div>
+                    <div class="mb-4">
+                        <label for="quantity_liters" class="block text-sm font-medium text-gray-700" data-lang="fr">Quantité (Litres)</label>
+                        <input type="number" id="quantity_liters" name="quantity_liters" min="0.1" step="0.1" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500" required aria-describedby="quantity_liters-error">
+                        <p id="quantity_liters-error" class="hidden text-red-600 text-sm mt-1" data-lang="fr">Veuillez entrer une quantité valide.</p>
+                    </div>
+                    <div class="mb-4">
+                        <label for="quality_grade" class="block text-sm font-medium text-gray-700" data-lang="fr">Qualité</label>
+                        <select id="quality_grade" name="quality_grade" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500" required aria-describedby="quality_grade-error">
+                            <option value="" disabled selected data-lang="fr">Sélectionner la qualité</option>
+                            <option value="A">A</option>
+                            <option value="B">B</option>
+                            <option value="C">C</option>
+                        </select>
+                        <p id="quality_grade-error" class="hidden text-red-600 text-sm mt-1" data-lang="fr">Veuillez sélectionner une qualité.</p>
+                    </div>
+
+                    <div class="flex justify-end gap-4">
+                        <button type="button" class="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400 focus:ring-2 focus:ring-gray-500 focus:outline-none" onclick="document.getElementById('milk-supply-modal').classList.add('hidden')" data-lang="fr">Annuler</button>
+                        <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none flex items-center" id="submit-supply">
+                            <span data-lang="fr">Ajouter</span>
+                            <svg id="loading-spinner" class="hidden h-5 w-5 animate-spin text-white ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Section Fournitures de Lait -->
+        <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+            <h2 class="text-xl font-semibold mb-4 text-gray-900" data-lang="fr">Fournitures de Lait de la Coopérative</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border rounded-lg">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="py-3 px-4 border-b text-left" data-lang="fr">ID Membre</th>
+                            <th class="py-3 px-4 border-b text-left" data-lang="fr">Membre</th>
+                            <th class="py-3 px-4 border-b text-left" data-lang="fr">Email</th>
+                            <th class="py-3 px-4 border-b text-left" data-lang="fr">Date</th>
+                            <th class="py-3 px-4 border-b text-left" data-lang="fr">Quantité (Litres)</th>
+                            <th class="py-3 px-4 border-b text-left" data-lang="fr">Qualité</th>
+                            <th class="py-3 px-4 border-b text-left" data-lang="fr">Prix/Litre ($)</th>
+                            <th class="py-3 px-4 border-b text-left" data-lang="fr">Total ($)</th>
+                            {% if user.role == 'MANAGER' %}
+                                <th class="py-3 px-4 border-b text-left" data-lang="fr">Actions</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for supply in supplies %}
+                        <tr class="hover:bg-gray-50 animate-fade-in">
+                            <td class="py-3 px-4 border-b">{{ supply.member.member_id }}</td>
+                            <td class="py-3 px-4 border-b">{{ supply.member }}</td>
+                            <td class="py-3 px-4 border-b">{{ supply.member.user.email|default:"Non défini" }}</td>
+                            <td class="py-3 px-4 border-b">{{ supply.supply_date }}</td>
+                            <td class="py-3 px-4 border-b">{{ supply.quantity_liters }}</td>
+                            <td class="py-3 px-4 border-b">{{ supply.get_quality_grade_display }}</td>
+                            <td class="py-3 px-4 border-b">${{ supply.price_per_liter|floatformat:2 }}</td>
+                            <td class="py-3 px-4 border-b">${{ supply.total_value|floatformat:2 }}</td>
+                            {% if user.role == 'MANAGER' %}
+                                <td class="py-3 px-4 border-b">
+                                    <a href="{% url 'milk_supply_update' supply.pk %}" class="text-blue-600 hover:underline" data-lang="fr">Modifier</a>
+                                    <span>|</span>
+                                    <a href="{% url 'milk_supply_delete' supply.pk %}" class="text-red-600 hover:underline" data-lang="fr">Supprimer</a>
+                                </td>
+                            {% endif %}
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="{% if user.role == 'MANAGER' %}9{% else %}8{% endif %}" class="py-3 px-4 border-b text-center text-gray-500" data-lang="fr">Aucune fourniture de lait.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Section Paiements -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h2 class="text-xl font-semibold mb-4 text-gray-900" data-lang="fr">Paiements de la Coopérative</h2>
+            <div class="overflow-x-auto">
+                <table class="min-w-full bg-white border rounded-lg">
+                    <thead class="bg-gray-200">
+                        <tr>
+                            <th class="py-3 px-4 border-b text-left" data-lang="fr">ID Membre</th>
+                            <th class="py-3 px-4 border-b text-left" data-lang="fr">Membre</th>
+                            <th class="py-3 px-4 border-b text-left" data-lang="fr">Email</th>
+                            <th class="py-3 px-4 border-b text-left" data-lang="fr">Date</th>
+                            <th class="py-3 px-4 border-b text-left" data-lang="fr">Montant ($)</th>
+                            <th class="py-3 px-4 border-b text-left" data-lang="fr">Statut</th>
+                            <th class="py-3 px-4 border-b text-left" data-lang="fr">ID de Transaction</th>
+                            {% if user.role == 'MANAGER' %}
+                                <th class="py-3 px-4 border-b text-left" data-lang="fr">Actions</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for payment in payments %}
+                        <tr class="hover:bg-gray-50 animate-fade-in">
+                            <td class="py-3 px-4 border-b">{{ payment.member.member_id }}</td>
+                            <td class="py-3 px-4 border-b">{{ payment.member }}</td>
+                            <td class="py-3 px-4 border-b">{{ payment.member.user.email|default:"Non défini" }}</td>
+                            <td class="py-3 px-4 border-b">{{ payment.payment_date }}</td>
+                            <td class="py-3 px-4 border-b">${{ payment.amount|floatformat:2 }}</td>
+                            <td class="py-3 px-4 border-b">{{ payment.get_status_display }}</td>
+                            <td class="py-3 px-4 border-b">{{ payment.transaction_id|default:"N/A" }}</td>
+                            {% if user.role == 'MANAGER' %}
+                                <td class="py-3 px-4 border-b">
+                                    <a href="{% url 'payment_update' payment.pk %}" class="text-blue-600 hover:underline" data-lang="fr">Modifier</a>
+                                    <span>|</span>
+                                    <a href="{% url 'payment_delete' payment.pk %}" class="text-red-600 hover:underline" data-lang="fr">Supprimer</a>
+                                </td>
+                            {% endif %}
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="{% if user.role == 'MANAGER' %}8{% else %}7{% endif %}" class="py-3 px-4 border-b text-center text-gray-500" data-lang="fr">Aucun paiement.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Validation du formulaire de fourniture de lait
+        const milkSupplyForm = document.getElementById('milk-supply-form');
+        const member_idInput = document.getElementById('member_id');
+        const memberDetails = document.getElementById('member-details');
+        const memberName = document.getElementById('member-name');
+        const memberEmail = document.getElementById('member-email');
+        const member_idError = document.getElementById('member_id-error');
+
+        if (milkSupplyForm) {
+            // Validation en temps réel pour member_id via AJAX
+            member_idInput.addEventListener('input', async function () {
+                const member_id = this.value.trim();
+                memberDetails.classList.add('hidden');
+                member_idError.classList.add('hidden');
+
+                if (member_id) {
+                    try {
+                        const response = await fetch(`/api/validate-member/${member_id}/`, {
+                            headers: {
+                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                            }
+                        });
+                        const data = await response.json();
+                        if (response.ok && data.valid) {
+                            memberName.textContent = `Nom: ${data.member.full_name || 'Non défini'}`;
+                            memberEmail.textContent = `Email: ${data.member.email || 'Non défini'}`;
+                            memberDetails.classList.remove('hidden');
+                        } else {
+                            member_idError.classList.remove('hidden');
+                        }
+                    } catch (error) {
+                        member_idError.classList.remove('hidden');
+                    }
+                }
+            });
+
+            milkSupplyForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const supplyDate = document.getElementById('supply_date');
+                const quantityLiters = document.getElementById('quantity_liters');
+                const qualityGrade = document.getElementById('quality_grade');
+                const pricePerLiter = document.getElementById('price_per_liter');
+                const submitButton = document.getElementById('submit-supply');
+                const loadingSpinner = document.getElementById('loading-spinner');
+                const submitText = submitButton.querySelector('span[data-lang="fr"]');
+                let isValid = true;
+
+                // Réinitialiser les erreurs
+                document.querySelectorAll('#milk-supply-form p[id$="-error"]').forEach(error => error.classList.add('hidden'));
+
+                // Valider les champs
+                if (!member_idInput.value.trim()) {
+                    member_idError.classList.remove('hidden');
+                    isValid = false;
+                }
+                if (!supplyDate.value) {
+                    document.getElementById('supply_date-error').classList.remove('hidden');
+                    isValid = false;
+                }
+                if (!quantityLiters.value || quantityLiters.value <= 0) {
+                    document.getElementById('quantity_liters-error').classList.remove('hidden');
+                    isValid = false;
+                }
+                if (!qualityGrade.value) {
+                    document.getElementById('quality_grade-error').classList.remove('hidden');
+                    isValid = false;
+                }
+                if (!pricePerLiter.value || pricePerLiter.value <= 0) {
+                    document.getElementById('price_per_liter-error').classList.remove('hidden');
+                    isValid = false;
+                }
+
+                if (isValid) {
+                    submitButton.disabled = true;
+                    submitText.classList.add('hidden');
+                    loadingSpinner.classList.remove('hidden');
+                    setTimeout(() => {
+                        milkSupplyForm.submit();
+                    }, 1000);
+                }
+            });
+        }
+
+        // Fermer le modal avec la touche Échap
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                const modal = document.getElementById('milk-supply-modal');
+                if (modal && !modal.classList.contains('hidden')) {
+                    modal.classList.add('hidden');
+                }
+            }
+        });
+    });
+</script>
+
+<style>
+    @keyframes fade-in {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slide-in {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fade-in 0.5s ease-out;
+    }
+    .animate-slide-in {
+        animation: slide-in 0.3s ease-out;
+    }
+</style>
+{% endblock %}

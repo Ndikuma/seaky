@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}Milk Supplies{% endblock %}
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-6">Milk Supplies</h1>
+    <div class="mb-4">
+        <a href="{% url 'milk_supply_create' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Milk Supply</a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border rounded-lg">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="py-3 px-4 border-b text-left">Member</th>
+                    <th class="py-3 px-4 border-b text-left">Date</th>
+                    <th class="py-3 px-4 border-b text-left">Quantity (Liters)</th>
+                    <th class="py-3 px-4 border-b text-left">Grade</th>
+                    <th class="py-3 px-4 border-b text-left">Price/Liter</th>
+                    <th class="py-3 px-4 border-b text-left">Total</th>
+                    <th class="py-3 px-4 border-b text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for supply in supplies %}
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-4 border-b">{{ supply.member }}</td>
+                    <td class="py-3 px-4 border-b">{{ supply.supply_date }}</td>
+                    <td class="py-3 px-4 border-b">{{ supply.quantity_liters }}</td>
+                    <td class="py-3 px-4 border-b">{{ supply.get_quality_grade_display }}</td>
+                    <td class="py-3 px-4 border-b">${{ supply.price_per_liter|floatformat:2 }}</td>
+                    <td class="py-3 px-4 border-b">${{ supply.total_value|floatformat:2 }}</td>
+                    <td class="py-3 px-4 border-b">
+                        <a href="{% url 'milk_supply_update' supply.pk %}" class="text-blue-600 hover:underline">Edit</a> |
+                        <a href="{% url 'milk_supply_delete' supply.pk %}" class="text-red-600 hover:underline">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="7" class="py-3 px-4 border-b text-center text-gray-500">No supplies.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

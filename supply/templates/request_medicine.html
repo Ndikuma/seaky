@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% block title %}Request {{ selected_medicine.name|default:"Medicine" }}{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-8 px-4 flex items-center justify-center">
+    <div class="max-w-2xl w-full bg-white p-8 rounded-xl shadow-lg animate-fade-in">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6">Request Medicine</h1>
+
+        <!-- Messages -->
+        {% if messages %}
+            <div class="mb-6">
+                {% for message in messages %}
+                    <div class="p-4 rounded-md {% if message.tags == 'success' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <!-- User Information -->
+        <div class="mb-8 p-6 bg-gray-50 rounded-lg">
+            <h2 class="text-lg font-semibold text-gray-700 mb-3">Your Information</h2>
+            <p class="text-sm text-gray-600"><strong>Username:</strong> {{ user.username|default:"N/A" }}</p>
+            <p class="text-sm text-gray-600"><strong>Email:</strong> {{ user.email|default:"N/A" }}</p>
+            {% if user.member_profile %}
+                <p class="text-sm text-gray-600"><strong>Full Name:</strong> {{ user.member_profile.full_name|default:"Not provided" }}</p>
+            {% else %}
+                <p class="text-sm text-gray-600"><strong>Member Profile:</strong> Not available</p>
+            {% endif %}
+        </div>
+
+        <!-- Medicine Information -->
+        <div class="mb-8">
+            <h2 class="text-lg font-semibold text-gray-700 mb-3">Medicine Details</h2>
+            <div class="flex items-center">
+                <img src="{% if selected_medicine.image_url %}{{ selected_medicine.image_url.url }}{% else %}/static/images/default-medicine.jpg{% endif %}" 
+                     alt="{{ selected_medicine.name|default:'Medicine' }}" 
+                     class="w-24 h-24 object-cover rounded-md mr-4">
+                <div>
+                    <p class="text-sm text-gray-600"><strong>Name:</strong> {{ selected_medicine.name|default:"N/A" }}</p>
+                    <p class="text-sm text-gray-600"><strong>Stock:</strong> {{ selected_medicine.stock_quantity|default:"0" }}</p>
+                    <p class="text-sm text-gray-600"><strong>Price:</strong> ${{ selected_medicine.price|default:"0.00" }}</p>
+                    <p class="text-sm text-gray-600"><strong>Description:</strong> {{ selected_medicine.description|default:"No description available" }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Request Form -->
+        <form method="post" action="{% url 'request_medicine' selected_medicine.id %}" id="medicine-request-form" class="space-y-6">
+            {% csrf_token %}
+            <input type="hidden" name="medicine" value="{{ selected_medicine.id }}">
+            <div>
+                <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+                <input type="number" name="quantity" id="quantity" min="1" max="{{ selected_medicine.stock_quantity|default:0 }}" 
+                       class="mt-1 block w-full border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 p-2" 
+                       required aria-describedby="quantity-error">
+                <p id="quantity-error" class="hidden text-red-600 text-sm mt-1">Quantity must be between 1 and {{ selected_medicine.stock_quantity|default:0 }}.</p>
+            </div>
+            <button type="submit" id="submit-button" 
+                    class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 hover:scale-105 transition-transform flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                    aria-label="Submit request for {{ selected_medicine.name|default:'medicine' }}">
+                <span id="submit-text">Submit Request</span>
+                <svg id="loading-spinner" class="hidden h-5 w-5 animate-spin text-white ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </button>
+        </form>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('medicine-request-form');
+        const quantityInput = document.getElementById('quantity');
+        const quantityError = document.getElementById('quantity-error');
+        const submitButton = document.getElementById('submit-button');
+        const submitText = document.getElementById('submit-text');
+        const loadingSpinner = document.getElementById('loading-spinner');
+
+        form.addEventListener('submit', function (e) {
+            const max = parseInt(quantityInput.max) || 0;
+            const value = parseInt(quantityInput.value);
+            if (value < 1 || value > max) {
+                e.preventDefault();
+                quantityError.classList.remove('hidden');
+                return;
+            }
+            submitButton.disabled = true;
+            submitText.classList.add('hidden');
+            loadingSpinner.classList.remove('hidden');
+        });
+
+        quantityInput.addEventListener('input', function () {
+            quantityError.classList.add('hidden');
+        });
+    });
+</script>
+
+<style>
+    @keyframes fade-in {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fade-in 0.5s ease-out;
+    }
+    .shadow-lg {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    .rounded-xl {
+        border-radius: 0.75rem;
+    }
+</style>
+{% endblock %}

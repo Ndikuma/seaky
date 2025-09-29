@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-md w-full bg-white p-8 rounded-2xl shadow-xl animate-fade-in transition">
+    
+    <!-- Branding -->
+    <div class="text-center mb-8">
+      <h1 class="text-3xl font-extrabold text-gray-900">Login to <span class="text-blue-600">Seasky Milk</span></h1>
+    </div>
+
+    <!-- Login Form -->
+    <form method="post" id="login-form" class="space-y-6">
+      {% csrf_token %}
+
+      <div>
+        <label for="username" class="block text-sm font-medium text-gray-700">Username</label>
+        <input
+          type="text"
+          name="username"
+          id="username"
+          required
+          aria-describedby="username-help"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Enter your username"
+        >
+      </div>
+
+      <div>
+        <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+        <input
+          type="password"
+          name="password"
+          id="password"
+          required
+          aria-describedby="password-help"
+          class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+          placeholder="Enter your password"
+        >
+      </div>
+
+      <button
+        type="submit"
+        id="submit-button"
+        class="w-full flex items-center justify-center bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition transform hover:scale-105"
+        aria-label="Login button"
+      >
+        <span id="submit-text">Login</span>
+        <svg id="loading-spinner" class="hidden ml-2 h-5 w-5 text-white animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.3 0 0 5.3 0 12h4zm2 5.3A8 8 0 014 12H0c0 3 1.1 5.8 3 7.9l3-2.6z"/>
+        </svg>
+      </button>
+
+      <div class="text-center">
+        <a href="#" class="text-sm text-blue-600 hover:underline" aria-label="Forgot Password">Forgot Password?</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- JavaScript for form loading state -->
+<script>
+  document.getElementById('login-form').addEventListener('submit', function () {
+    const submitButton = document.getElementById('submit-button');
+    const submitText = document.getElementById('submit-text');
+    const spinner = document.getElementById('loading-spinner');
+    submitButton.disabled = true;
+    submitText.classList.add('hidden');
+    spinner.classList.remove('hidden');
+  });
+</script>
+
+<!-- Custom Tailwind Animations -->
+<style>
+  @keyframes fade-in {
+    0% { opacity: 0; transform: translateY(20px); }
+    100% { opacity: 1; transform: translateY(0); }
+  }
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out;
+  }
+</style>
+{% endblock %}

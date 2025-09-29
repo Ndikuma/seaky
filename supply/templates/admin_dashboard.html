@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-6">Admin Dashboard</h1>
+    <div class="mb-4 space-x-2">
+        <a href="{% url 'cooperative_create' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Cooperative</a>
+        <a href="{% url 'member_create' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Member</a>
+        <a href="{% url 'milk_supply_create' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Milk Supply</a>
+        <a href="{% url 'payment_create' %}" class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Process Payment</a>
+    </div>
+
+    <h2 class="text-xl font-semibold mt-6 mb-2">Cooperatives</h2>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border rounded-lg">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="py-3 px-4 border-b text-left">Name</th>
+                    <th class="py-3 px-4 border-b text-left">Location</th>
+                    <th class="py-3 px-4 border-b text-left">Contact</th>
+                    <th class="py-3 px-4 border-b text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cooperative in cooperatives %}
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-4 border-b">{{ cooperative.name }}</td>
+                    <td class="py-3 px-4 border-b">{{ cooperative.location|default:"N/A" }}</td>
+                    <td class="py-3 px-4 border-b">{{ cooperative.contact_info|default:"N/A" }}</td>
+                    <td class="py-3 px-4 border-b">
+                        <a href="{% url 'cooperative_update' cooperative.pk %}" class="text-blue-600 hover:underline">Edit</a> |
+                        <a href="{% url 'cooperative_delete' cooperative.pk %}" class="text-red-600 hover:underline">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="py-3 px-4 border-b text-center text-gray-500">No cooperatives.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2 class="text-xl font-semibold mt-6 mb-2">Members</h2>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border rounded-lg">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="py-3 px-4 border-b text-left">Name</th>
+                    <th class="py-3 px-4 border-b text-left">Member ID</th>
+                    <th class="py-3 px-4 border-b text-left">Cooperative</th>
+                    <th class="py-3 px-4 border-b text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in members %}
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-4 border-b">{{ member }}</td>
+                    <td class="py-3 px-4 border-b">{{ member.member_id }}</td>
+                    <td class="py-3 px-4 border-b">{{ member.cooperative|default:"N/A" }}</td>
+                    <td class="py-3 px-4 border-b">
+                        <a href="{% url 'member_update' member.pk %}" class="text-blue-600 hover:underline">Edit</a> |
+                        <a href="{% url 'member_delete' member.pk %}" class="text-red-600 hover:underline">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="py-3 px-4 border-b text-center text-gray-500">No members.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2 class="text-xl font-semibold mt-6 mb-2">Milk Supplies</h2>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border rounded-lg">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="py-3 px-4 border-b text-left">Member</th>
+                    <th class="py-3 px-4 border-b text-left">Date</th>
+                    <th class="py-3 px-4 border-b text-left">Quantity (Liters)</th>
+                    <th class="py-3 px-4 border-b text-left">Grade</th>
+                    <th class="py-3 px-4 border-b text-left">Price/Liter</th>
+                    <th class="py-3 px-4 border-b text-left">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for supply in supplies %}
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-4 border-b">{{ supply.member }}</td>
+                    <td class="py-3 px-4 border-b">{{ supply.supply_date }}</td>
+                    <td class="py-3 px-4 border-b">{{ supply.quantity_liters }}</td>
+                    <td class="py-3 px-4 border-b">{{ supply.get_quality_grade_display }}</td>
+                    <td class="py-3 px-4 border-b">${{ supply.price_per_liter|floatformat:2 }}</td>
+                    <td class="py-3 px-4 border-b">${{ supply.total_value|floatformat:2 }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="6" class="py-3 px-4 border-b text-center text-gray-500">No supplies.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <h2 class="text-xl font-semibold mt-6 mb-2">Payments</h2>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border rounded-lg">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="py-3 px-4 border-b text-left">Member</th>
+                    <th class="py-3 px-4 border-b text-left">Date</th>
+                    <th class="py-3 px-4 border-b text-left">Amount</th>
+                    <th class="py-3 px-4 border-b text-left">Status</th>
+                    <th class="py-3 px-4 border-b text-left">Transaction ID</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for payment in payments %}
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-4 border-b">{{ payment.member }}</td>
+                    <td class="py-3 px-4 border-b">{{ payment.payment_date }}</td>
+                    <td class="py-3 px-4 border-b">${{ payment.amount|floatformat:2 }}</td>
+                    <td class="py-3 px-4 border-b">{{ payment.get_status_display }}</td>
+                    <td class="py-3 px-4 border-b">{{ payment.transaction_id|default:"N/A" }}</td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="5" class="py-3 px-4 border-b text-center text-gray-500">No payments.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,59 @@
+
+{% extends 'base.html' %}
+{% block title %}Payments{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-6 px-4">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md animate-fade-in">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">Payments</h1>
+        {% if user.role == 'ADMIN' or user.role == 'MANAGER' %}
+        <div class="mb-4">
+            <a href="{% url 'payment_create' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 hover:scale-105 transition-transform">Process Payment</a>
+        </div>
+        {% endif %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full bg-white border rounded-lg">
+                <thead class="bg-gray-100">
+                    <tr>
+                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Member</th>
+                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Date</th>
+                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Amount</th>
+                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Status</th>
+                        {% if user.role == 'ADMIN' or user.role == 'MANAGER' %}
+                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for payment in payments %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-2">{{ payment.member }}</td>
+                        <td class="px-4 py-2">{{ payment.payment_date|date:"Y-m-d" }}</td>
+                        <td class="px-4 py-2">${{ payment.amount|floatformat:2 }}</td>
+                        <td class="px-4 py-2">{{ payment.get_status_display }}</td>
+                        {% if user.role == 'ADMIN' or user.role == 'MANAGER' %}
+                        <td class="px-4 py-2">
+                            <a href="{% url 'payment_update' payment.pk %}" class="text-blue-600 hover:underline">Edit</a>
+                            <a href="{% url 'payment_delete' payment.pk %}" class="text-red-600 hover:underline ml-2">Delete</a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="{% if user.role == 'ADMIN' or user.role == 'MANAGER' %}5{% else %}4{% endif %}" class="px-4 py-2 text-center text-gray-500">No payments found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<style>
+    @keyframes fade-in {
+        0% { opacity: 0; transform: translateY(10px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fade-in 0.3s ease-in-out;
+    }
+</style>
+{% endblock %}

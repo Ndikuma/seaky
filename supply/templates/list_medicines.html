@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% block title %}Medicine List{% endblock %}
+{% block content %}
+{%load static%}
+<div class="min-h-screen bg-gray-50 py-8 px-4">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header and Filter Section -->
+        <div class="flex flex-col sm:flex-row justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900">Available Medicines</h1>
+            <div class="mt-4 sm:mt-0 flex space-x-4">
+                <input type="text" id="search-input" placeholder="Search medicines..." 
+                       class="px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500 w-full sm:w-64">
+                <select id="sort-select" class="px-4 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500">
+                    <option value="name">Sort by Name</option>
+                    <option value="price">Sort by Price</option>
+                    <option value="stock">Sort by Stock</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Medicine Grid -->
+        <div id="medicine-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {% for medicine in medicines %}
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transform transition hover:scale-105 animate-fade-in relative"
+                     data-name="{{ medicine.name|lower }}" 
+                     data-price="{{ medicine.price }}" 
+                     data-stock="{{ medicine.stock_quantity }}">
+                    <!-- Stock Status Indicator -->
+                    {% if medicine.stock_quantity <= 10 %}
+                        <span class="absolute top-2 right-2 bg-red-100 text-red-800 text-xs font-semibold px-2 py-1 rounded">Low Stock</span>
+                    {% endif %}
+                    <img src="{% if medicine.image_url %}{{ medicine.image_url.url }}{% else %}{% static 'images/download.jpeg' %}{% endif %}" 
+                         alt="{{ medicine.name }}" 
+                         class="w-full h-48 object-cover">
+                    <div class="p-5">
+                        <h2 class="text-xl font-semibold text-gray-900">{{ medicine.name }}</h2>
+                        <p class="text-sm text-gray-600 mt-1">Stock: {{ medicine.stock_quantity }}</p>
+                        <p class="text-sm text-gray-600 mt-1">Price: ${{ medicine.price }}</p>
+                        <p class="text-sm text-gray-500 mt-2 line-clamp-3" title="{{ medicine.description|default:'No description available' }}">
+                            {{ medicine.description|default:"No description available" }}
+                        </p>
+                        <a href="{% url 'request_medicine' medicine.id %}" 
+                           class="mt-4 block w-full bg-blue-600 text-white py-2 rounded-md text-center hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                           aria-label="Request {{ medicine.name }}">
+                            Request
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- Empty State -->
+        {% if not medicines %}
+            <div class="text-center py-12">
+                <p class="text-lg text-gray-600">No medicines available at the moment.</p>
+                <p class="text-sm text-gray-500 mt-2">Check back later or contact an admin to add medicines.</p>
+                <a href="{% url 'add_medicine' %}" 
+                   class="mt-4 inline-block bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
+                    Add Medicine
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const searchInput = document.getElementById('search-input');
+        const sortSelect = document.getElementById('sort-select');
+        const medicineGrid = document.getElementById('medicine-grid');
+        const medicines = Array.from(medicineGrid.getElementsByClassName('relative'));
+
+        // Search functionality
+        searchInput.addEventListener('input', function () {
+            const query = this.value.toLowerCase();
+            medicines.forEach(medicine => {
+                const name = medicine.getAttribute('data-name');
+                medicine.style.display = name.includes(query) ? '' : 'none';
+            });
+        });
+
+        // Sort functionality
+        sortSelect.addEventListener('change', function () {
+            const sortBy = this.value;
+            const sortedMedicines = medicines.sort((a, b) => {
+                if (sortBy === 'name') {
+                    return a.getAttribute('data-name').localeCompare(b.getAttribute('data-name'));
+                } else if (sortBy === 'price') {
+                    return parseFloat(a.getAttribute('data-price')) - parseFloat(b.getAttribute('data-price'));
+                } else if (sortBy === 'stock') {
+                    return parseInt(b.getAttribute('data-stock')) - parseInt(a.getAttribute('data-stock'));
+                }
+            });
+            medicineGrid.innerHTML = '';
+            sortedMedicines.forEach(medicine => medicineGrid.appendChild(medicine));
+        });
+    });
+</script>
+
+<style>
+    @keyframes fade-in {
+        0% { opacity: 0; transform: translateY(20px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fade-in 0.5s ease-out;
+    }
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .shadow-lg {
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+    .rounded-xl {
+        border-radius: 0.75rem;
+    }
+</style>
+{% endblock %}

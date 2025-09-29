@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>{% load static%}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeaSky Dairy - {% block title %}{% endblock %}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 font-sans">
+    <nav class="bg-gradient-to-r from-blue-600 to-blue-800 shadow-lg sticky top-0 z-50">
+        <div class="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
+            <div class="relative flex h-16 items-center justify-between">
+                <!-- Mobile Menu Button -->
+                <div class="absolute inset-y-0 left-0 flex items-center sm:hidden">
+                    <button type="button" class="relative inline-flex items-center justify-center rounded-md p-2 text-white hover:bg-blue-700 focus:ring-2 focus:ring-white focus:outline-none" aria-controls="mobile-menu" aria-expanded="false" id="mobile-menu-button">
+                        <span class="sr-only">Open main menu</span>
+                        <svg class="block h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                        </svg>
+                        <svg class="hidden h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+                <!-- Logo and Brand -->
+                <div class="flex flex-1 items-center justify-center sm:items-stretch sm:justify-start">
+                    <div class="flex shrink-0 items-center">
+                        <a href="{% url 'landing_page' %}" class="flex items-center">
+                            <img class="h-8 w-auto" src="{% static 'images/lifewaylogo.png'%}" alt="SeaSky Dairy">
+                            <span class="ml-2 text-xl font-bold text-white" data-lang="fr">SeaSky Dairy</span>
+                            <span class="ml-2 text-xl font-bold text-white" data-lang="en" hidden>SeaSky Dairy</span>
+                        </a>
+                    </div>
+                    <!-- Desktop Menu -->
+                    <div class="hidden sm:ml-6 sm:block">
+                        <div class="flex space-x-4">
+                            <a href="{% url 'landing_page' %}" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'landing_page' %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" aria-current="{% if request.resolver_match.url_name == 'landing_page' %}page{% endif %}" data-lang="fr">Accueil</a>
+                            <a href="{% url 'landing_page' %}" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'landing_page' %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" aria-current="{% if request.resolver_match.url_name == 'landing_page' %}page{% endif %}" data-lang="en" hidden>Home</a>
+                            {% if user.is_authenticated %}
+                                {% if user.role == 'ADMIN' %}
+                                    <a href="{% url 'admin_dashboard' %}" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'admin_dashboard' %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" aria-current="{% if request.resolver_match.url_name == 'admin_dashboard' %}page{% endif %}">Admin Dashboard</a>
+                                    <a href="{% url 'cooperative_list' %}" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'cooperative_list' %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" aria-current="{% if request.resolver_match.url_name == 'cooperative_list' %}page{% endif %}">Cooperatives</a>
+                                    <a href="{% url 'member_list' %}" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'member_list' %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" aria-current="{% if request.resolver_match.url_name == 'member_list' %}page{% endif %}">Members</a>
+                                    <a href="{% url 'milk_supply_list' %}" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'milk_supply_list' %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" aria-current="{% if request.resolver_match.url_name == 'milk_supply_list' %}page{% endif %}">Milk Supplies</a>
+                                    <a href="{% url 'payment_list' %}" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'payment_list' %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" aria-current="{% if request.resolver_match.url_name == 'payment_list' %}page{% endif %}">Payments</a>
+                                    <a href="{% url 'medicine_request_list' %}" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'medicine_request_list' %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" aria-current="{% if request.resolver_match.url_name == 'medicine_request_list' %}page{% endif %}">Medicine Requests</a>
+                                {% elif user.role == 'MANAGER' %}
+                                    <a href="{% url 'manager_dashboard' %}" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'manager_dashboard' %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" aria-current="{% if request.resolver_match.url_name == 'manager_dashboard' %}page{% endif %}">Manager Dashboard</a>
+                                       <a href="{% url 'milk_supply_list' %}" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'milk_supply_list' %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" aria-current="{% if request.resolver_match.url_name == 'milk_supply_list' %}page{% endif %}">Milk Supplies</a>
+                                    <a href="{% url 'payment_list' %}" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'payment_list' %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" aria-current="{% if request.resolver_match.url_name == 'payment_list' %}page{% endif %}">Payments</a>
+                                    <a href="{% url 'medicine_request_list' %}" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'medicine_request_list' %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" aria-current="{% if request.resolver_match.url_name == 'medicine_request_list' %}page{% endif %}">Medicine Requests</a>
+                                {% elif user.role == 'MEMBER' %}
+                                    <a href="{% url 'member_dashboard' %}" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'member_dashboard' %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" aria-current="{% if request.resolver_match.url_name == 'member_dashboard' %}page{% endif %}">Member Dashboard</a>
+                                    <a href="{% url 'medicine_list' %}" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'medicine_list' %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" aria-current="{% if request.resolver_match.url_name == 'medicine_list' %}page{% endif %}">Request Medicine</a>
+                                {% endif %}
+                            {% else %}
+                                <a href="{% url 'landing_page' %}#about" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'landing_page' and '#about' in request.path %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" data-lang="fr">À propos</a>
+                                <a href="{% url 'landing_page' %}#about" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'landing_page' and '#about' in request.path %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" data-lang="en" hidden>About Us</a>
+                                <a href="{% url 'landing_page' %}#subsidiaries" class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 hover:scale-105 transition-transform" data-lang="fr">Nos Filiales</a>
+                                <a href="{% url 'landing_page' %}#subsidiaries" class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 hover:scale-105 transition-transform" data-lang="en" hidden>Our Subsidiaries</a>
+                                <a href="{% url 'landing_page' %}#activities" class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 hover:scale-105 transition-transform" data-lang="fr">Nos Activités</a>
+                                <a href="{% url 'landing_page' %}#activities" class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 hover:scale-105 transition-transform" data-lang="en" hidden>Our Activities</a>
+                                <a href="{% url 'landing_page' %}#careers" class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 hover:scale-105 transition-transform" data-lang="fr">Carrières</a>
+                                <a href="{% url 'landing_page' %}#careers" class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 hover:scale-105 transition-transform" data-lang="en" hidden>Careers</a>
+                                <a href="{% url 'landing_page' %}#contact" class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 hover:scale-105 transition-transform" data-lang="fr">Contact</a>
+                                <a href="{% url 'landing_page' %}#contact" class="rounded-md px-3 py-2 text-sm font-medium text-white hover:bg-blue-700 hover:scale-105 transition-transform" data-lang="en" hidden>Contact</a>
+                                <a href="{% url 'login' %}" class="rounded-md px-3 py-2 text-sm font-medium text-white {% if request.resolver_match.url_name == 'login' %}bg-blue-900{% else %}hover:bg-blue-700 hover:scale-105 transition-transform{% endif %}" aria-current="{% if request.resolver_match.url_name == 'login' %}page{% endif %}">Login</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <!-- Language Toggle and User Menu -->
+                <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+                    <select id="language-toggle" class="rounded-md px-2 py-1 text-sm bg-blue-600 text-white border-none focus:ring-2 focus:ring-white hover:bg-blue-700">
+                        <option value="fr">Français</option>
+                        <option value="en">English</option>
+                    </select>
+                    {% if user.is_authenticated %}
+                        <div class="relative ml-3">
+                            <button type="button" class="relative rounded-full bg-blue-600 p-1 text-white hover:text-gray-200 focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600" aria-label="View notifications" id="notification-button">
+                                <span class="sr-only">View notifications</span>
+                                <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 0 0 5.454-1.31A8.967 8.967 0 0 1 18 9.75V9A6 6 0 0 0 6 9v.75a8.967 8.967 0 0 1-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 0 1-5.714 0m5.714 0a3 3 0 1 1-5.714 0" />
+                                </svg>
+                                <span class="absolute -top-1 -right-1 bg-red-600 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center">3</span>
+                            </button>
+                            <div class="absolute right-0 z-10 mt-2 w-64 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-none hidden" role="menu" aria-orientation="vertical" aria-labelledby="notification-button" id="notification-menu" tabindex="-1">
+                                <p class="block px-4 py-2 text-sm text-gray-700">Pending Medicine Requests: 2</p>
+                                <p class="block px-4 py-2 text-sm text-gray-700">New Milk Supply: 1</p>
+                                <a href="{% url 'medicine_request_list' %}" class="block px-4 py-2 text-sm text-blue-600 hover:bg-gray-100">View All</a>
+                            </div>
+                        </div>
+                        <div class="relative ml-3">
+                            <button type="button" class="relative flex rounded-full bg-blue-600 text-sm focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600 hover:scale-105 transition-transform" id="user-menu-button" aria-expanded="false" aria-haspopup="true" aria-label="Open user menu">
+                                <span class="sr-only">Open user menu</span>
+                                <img class="h-8 w-8 rounded-full" src="{% if user.member_profile and user.member_profile.profile_image %}{{ user.member_profile.profile_image.url }}{% else %} {% static 'images/download.png'%}{% endif %}" alt="{% if user.member_profile %}{{ user.member_profile.get_full_name|default:user.username }}{% else %}{{ user.username }}{% endif %}">
+                            </button>
+                            <div class="absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md bg-white py-1 shadow-lg ring-1 ring-black/5 focus:outline-none hidden" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button" id="user-menu" tabindex="-1">
+                                <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" data-lang="fr">Déconnexion</a>
+                                <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem" data-lang="en" hidden>Sign Out</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <!-- Mobile Menu -->
+        <div class="hidden sm:hidden" id="mobile-menu">
+            <div class="space-y-1 px-2 pt-2 pb-3 bg-blue-800">
+                <a href="{% url 'landing_page' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'landing_page' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" data-lang="fr">Accueil</a>
+                <a href="{% url 'landing_page' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'landing_page' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" data-lang="en" hidden>Home</a>
+                {% if user.is_authenticated %}
+                    {% if user.role == 'ADMIN' %}
+                        <a href="{% url 'admin_dashboard' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'admin_dashboard' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" aria-current="{% if request.resolver_match.url_name == 'admin_dashboard' %}page{% endif %}">Admin Dashboard</a>
+                        <a href="{% url 'cooperative_list' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'cooperative_list' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" aria-current="{% if request.resolver_match.url_name == 'cooperative_list' %}page{% endif %}">Cooperatives</a>
+                        <a href="{% url 'member_list' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'member_list' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" aria-current="{% if request.resolver_match.url_name == 'member_list' %}page{% endif %}">Members</a>
+                        <a href="{% url 'milk_supply_list' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'milk_supply_list' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" aria-current="{% if request.resolver_match.url_name == 'milk_supply_list' %}page{% endif %}">Milk Supplies</a>
+                        <a href="{% url 'payment_list' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'payment_list' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" aria-current="{% if request.resolver_match.url_name == 'payment_list' %}page{% endif %}">Payments</a>
+                        <a href="{% url 'medicine_request_list' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'medicine_request_list' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" aria-current="{% if request.resolver_match.url_name == 'medicine_request_list' %}page{% endif %}">Medicine Requests</a>
+                    {% elif user.role == 'MANAGER' %}
+                        <a href="{% url 'manager_dashboard' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'manager_dashboard' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" aria-current="{% if request.resolver_match.url_name == 'manager_dashboard' %}page{% endif %}">Manager Dashboard</a>
+                        <a href="{% url 'member_list' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'member_list' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" aria-current="{% if request.resolver_match.url_name == 'member_list' %}page{% endif %}">Members</a>
+                        <a href="{% url 'milk_supply_list' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'milk_supply_list' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" aria-current="{% if request.resolver_match.url_name == 'milk_supply_list' %}page{% endif %}">Milk Supplies</a>
+                        <a href="{% url 'payment_list' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'payment_list' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" aria-current="{% if request.resolver_match.url_name == 'payment_list' %}page{% endif %}">Payments</a>
+                        <a href="{% url 'medicine_request_list' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'medicine_request_list' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" aria-current="{% if request.resolver_match.url_name == 'medicine_request_list' %}page{% endif %}">Medicine Requests</a>
+                    {% elif user.role == 'MEMBER' %}
+                        <a href="{% url 'member_dashboard' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'member_dashboard' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" aria-current="{% if request.resolver_match.url_name == 'member_dashboard' %}page{% endif %}">Member Dashboard</a>
+                        <a href="{% url 'medicine_list' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'medicine_list' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" aria-current="{% if request.resolver_match.url_name == 'medicine_list' %}page{% endif %}">Request Medicine</a>
+                    {% endif %}
+                    <a href="{% url 'logout' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'logout' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" data-lang="fr">Déconnexion</a>
+                    <a href="{% url 'logout' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'logout' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" data-lang="en" hidden>Sign Out</a>
+                {% else %}
+                    <a href="{% url 'landing_page' %}#about" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'landing_page' and '#about' in request.path %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" data-lang="fr">À propos</a>
+                    <a href="{% url 'landing_page' %}#about" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'landing_page' and '#about' in request.path %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}" data-lang="en" hidden>About Us</a>
+                    <a href="{% url 'landing_page' %}#subsidiaries" class="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-blue-700" data-lang="fr">Nos Filiales</a>
+                    <a href="{% url 'landing_page' %}#subsidiaries" class="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-blue-700" data-lang="en" hidden>Our Subsidiaries</a>
+                    <a href="{% url 'landing_page' %}#activities" class="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-blue-700" data-lang="fr">Nos Activités</a>
+                    <a href="{% url 'landing_page' %}#activities" class="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-blue-700" data-lang="en" hidden>Our Activities</a>
+                    <a href="{% url 'landing_page' %}#careers" class="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-blue-700" data-lang="fr">Carrières</a>
+                    <a href="{% url 'landing_page' %}#careers" class="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-blue-700" data-lang="en" hidden>Careers</a>
+                    <a href="{% url 'landing_page' %}#contact" class="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-blue-700" data-lang="fr">Contact</a>
+                    <a href="{% url 'landing_page' %}#contact" class="block rounded-md px-3 py-2 text-base font-medium text-white hover:bg-blue-700" data-lang="en" hidden>Contact</a>
+                    <a href="{% url 'login' %}" class="block rounded-md px-3 py-2 text-base font-medium text-white {% if request.resolver_match.url_name == 'login' %}bg-blue-900{% else %}hover:bg-blue-700{% endif %}">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Content -->
+    <div class="container mx-auto mt-6 px-4 sm:px-6 lg:px-8">
+        {% if messages %}
+            <div class="mb-6 space-y-2" role="alert" aria-live="assertive">
+                {% for message in messages %}
+                    <div class="p-4 text-white rounded-lg flex justify-between items-center animate-fade-in {% if message.tags == 'success' %}bg-green-500{% else %}bg-red-500{% endif %}" role="alert">
+                        <span>{{ message }}</span>
+                        <button type="button" class="text-white hover:text-gray-200" onclick="this.parentElement.remove()" aria-label="Close message">
+                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% block content %}
+        {% endblock %}
+    </div>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div>
+                    <h3 class="text-lg font-semibold mb-4" data-lang="fr">SeaSky Dairy</h3>
+                    <h3 class="text-lg font-semibold mb-4" data-lang="en" hidden>SeaSky Dairy</h3>
+                    <p class="text-gray-400">A LIFEWAY Company subsidiary. © 2025 Life Way Company. By Digital Web</p>
+                    <p class="text-gray-400 mt-2">
+                        <a href="http://www.lifewayco.bi" class="text-gray-400 hover:text-white">www.lifewayco.bi</a>
+                    </p>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4" data-lang="fr">Liens utiles</h3>
+                    <h3 class="text-lg font-semibold mb-4" data-lang="en" hidden>Useful Links</h3>
+                    <ul class="space-y-2">
+                        <li><a href="{% url 'landing_page' %}#about" class="text-gray-400 hover:text-white" data-lang="fr">À propos de LIFEWAY</a></li>
+                        <li><a href="{% url 'landing_page' %}#about" class="text-gray-400 hover:text-white" data-lang="en" hidden>About LIFEWAY</a></li>
+                        <li><a href="{% url 'landing_page' %}#subsidiaries" class="text-gray-400 hover:text-white" data-lang="fr">Nos Filiales</a></li>
+                        <li><a href="{% url 'landing_page' %}#subsidiaries" class="text-gray-400 hover:text-white" data-lang="en" hidden>Our Subsidiaries</a></li>
+                        <li><a href="{% url 'landing_page' %}#contact" class="text-gray-400 hover:text-white" data-lang="fr">Contact</a></li>
+                        <li><a href="{% url 'landing_page' %}#contact" class="text-gray-400 hover:text-white" data-lang="en" hidden>Contact</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="text-lg font-semibold mb-4" data-lang="fr">Rester en contact</h3>
+                    <h3 class="text-lg font-semibold mb-4" data-lang="en" hidden>Stay in Touch</h3>
+                    <p class="text-gray-400">MUKAZA, Quartier Rohero I, Avenue des Manguiers, N° 8</p>
+                    <p class="text-gray-400">Mobile: +257 22278402 / +257 71140000</p>
+                    <p class="text-gray-400">Email: <a href="mailto:info@lifewayco.bi" class="hover:text-white">info@lifewayco.bi</a></p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Mobile Menu Toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            mobileMenuButton.addEventListener('click', function () {
+                const openIcon = this.querySelector('svg.block');
+                const closeIcon = this.querySelector('svg.hidden');
+                const isExpanded = mobileMenu.classList.toggle('hidden');
+                openIcon.classList.toggle('hidden');
+                closeIcon.classList.toggle('hidden');
+                this.setAttribute('aria-expanded', !isExpanded);
+                if (!isExpanded) {
+                    mobileMenu.querySelector('a').focus();
+                }
+            });
+
+            // User Menu Toggle
+            const userMenuButton = document.getElementById('user-menu-button');
+            if (userMenuButton) {
+                userMenuButton.addEventListener('click', function () {
+                    const userMenu = document.getElementById('user-menu');
+                    const isExpanded = userMenu.classList.toggle('hidden');
+                    this.setAttribute('aria-expanded', !isExpanded);
+                    if (!isExpanded) {
+                        userMenu.querySelector('a').focus();
+                    }
+                });
+            }
+
+            // Notification Menu Toggle
+            const notificationButton = document.getElementById('notification-button');
+            if (notificationButton) {
+                notificationButton.addEventListener('click', function () {
+                    const notificationMenu = document.getElementById('notification-menu');
+                    const isExpanded = notificationMenu.classList.toggle('hidden');
+                    this.setAttribute('aria-expanded', !isExpanded);
+                    if (!isExpanded) {
+                        notificationMenu.querySelector('a').focus();
+                    }
+                });
+            }
+
+            // Language Toggle
+            const languageToggle = document.getElementById('language-toggle');
+            const frElements = document.querySelectorAll('[data-lang="fr"]');
+            const enElements = document.querySelectorAll('[data-lang="en"]');
+            const savedLang = localStorage.getItem('language') || 'fr';
+            languageToggle.value = savedLang;
+            frElements.forEach(el => el.hidden = savedLang !== 'fr');
+            enElements.forEach(el => el.hidden = savedLang !== 'en');
+
+            languageToggle.addEventListener('change', function () {
+                const lang = this.value;
+                localStorage.setItem('language', lang);
+                frElements.forEach(el => el.hidden = lang !== 'fr');
+                enElements.forEach(el => el.hidden = lang !== 'en');
+            });
+
+            // Close Menus and Messages on Esc Key
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape') {
+                    document.querySelectorAll('[role="alert"] .p-4').forEach(message => message.remove());
+                    const userMenu = document.getElementById('user-menu');
+                    const notificationMenu = document.getElementById('notification-menu');
+                    if (userMenu && !userMenu.classList.contains('hidden')) {
+                        userMenu.classList.add('hidden');
+                        userMenuButton.setAttribute('aria-expanded', 'false');
+                        userMenuButton.focus();
+                    }
+                    if (notificationMenu && !notificationMenu.classList.contains('hidden')) {
+                        notificationMenu.classList.add('hidden');
+                        notificationButton.setAttribute('aria-expanded', 'false');
+                        notificationButton.focus();
+                    }
+                    if (!mobileMenu.classList.contains('hidden')) {
+                        mobileMenu.classList.add('hidden');
+                        mobileMenuButton.setAttribute('aria-expanded', 'false');
+                        mobileMenuButton.focus();
+                    }
+                }
+            });
+        });
+    </script>
+
+    <style>
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes slide-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .animate-fade-in {
+            animation: fade-in 0.5s ease-in-out;
+        }
+        .animate-slide-in {
+            animation: slide-in 0.3s ease-in-out;
+        }
+    </style>
+</body>
+</html>

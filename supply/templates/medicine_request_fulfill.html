@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Fulfill Medicine Request{% endblock %}
+{% block content %}
+<div class="min-h-screen flex items-center justify-center bg-gray-100 py-6 px-4">
+    <div class="max-w-md w-full bg-white p-6 rounded-lg shadow-md animate-fade-in">
+        <h1 class="text-2xl font-bold text-gray-800 mb-4">Fulfill Request</h1>
+        <p class="text-sm text-gray-600 mb-4">For {{ request.medicine.name }} by {{ request.member }}</p>
+        <form method="post" id="fulfill-form" class="space-y-4">
+            {% csrf_token %}
+            <div>
+                <label for="quantity" class="block text-sm font-medium text-gray-700">Quantity</label>
+                <input type="number" name="quantity" id="quantity" min="1" max="{{ request.quantity }}" class="mt-1 block w-full border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" required>
+            </div>
+            <button type="submit" id="submit-button" class="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 hover:scale-105 transition-transform flex items-center justify-center">
+                <span id="submit-text">Fulfill</span>
+                <svg id="loading-spinner" class="hidden h-5 w-5 animate-spin text-white ml-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+            </button>
+        </form>
+    </div>
+</div>
+<script>
+    document.getElementById('fulfill-form').addEventListener('submit', function () {
+        document.getElementById('submit-button').disabled = true;
+        document.getElementById('submit-text').classList.add('hidden');
+        document.getElementById('loading-spinner').classList.remove('hidden');
+    });
+</script>
+<style>
+    @keyframes fade-in {
+        0% { opacity: 0; transform: translateY(10px); }
+        100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+        animation: fade-in 0.3s ease-in-out;
+    }
+</style>
+{% endblock %}

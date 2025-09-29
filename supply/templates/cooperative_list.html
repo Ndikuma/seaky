@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+{% block title %}Cooperatives{% endblock %}
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-6">Cooperatives</h1>
+    <div class="mb-4">
+        <a href="{% url 'cooperative_create' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Cooperative</a>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border rounded-lg">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="py-3 px-4 border-b text-left">Name</th>
+                    <th class="py-3 px-4 border-b text-left">Location</th>
+                    <th class="py-3 px-4 border-b text-left">Contact</th>
+                    <th class="py-3 px-4 border-b text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for cooperative in cooperatives %}
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-4 border-b">{{ cooperative.name }}</td>
+                    <td class="py-3 px-4 border-b">{{ cooperative.location|default:"N/A" }}</td>
+                    <td class="py-3 px-4 border-b">{{ cooperative.contact_info|default:"N/A" }}</td>
+                    <td class="py-3 px-4 border-b">
+                        <a href="{% url 'cooperative_update' cooperative.pk %}" class="text-blue-600 hover:underline">Edit</a> |
+                        <a href="{% url 'cooperative_delete' cooperative.pk %}" class="text-red-600 hover:underline">Delete</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="4" class="py-3 px-4 border-b text-center text-gray-500">No cooperatives.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
