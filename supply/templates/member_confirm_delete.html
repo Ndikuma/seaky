@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}Delete Member{% endblock %}
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-md max-w-lg mx-auto">
+    <h1 class="text-2xl font-bold mb-6">Delete Member</h1>
+    <p class="mb-4">Are you sure you want to delete "{{ member }}"? Their login account, milk supplies, payments and medicine requests will also be deleted.</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700">Confirm Delete</button>
+        <a href="{% url 'member_list' %}" class="ml-4 text-blue-600 hover:underline">Cancel</a>
+    </form>
+</div>
+{% endblock %}

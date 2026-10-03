@@ -15,6 +15,9 @@
                     <option value="price">Sort by Price</option>
                     <option value="stock">Sort by Stock</option>
                 </select>
+                {% if user.role == 'ADMIN' %}
+                <a href="{% url 'add_medicine' %}" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 whitespace-nowrap">Add Medicine</a>
+                {% endif %}
             </div>
         </div>
 
@@ -54,10 +57,12 @@
             <div class="text-center py-12">
                 <p class="text-lg text-gray-600">No medicines available at the moment.</p>
                 <p class="text-sm text-gray-500 mt-2">Check back later or contact an admin to add medicines.</p>
+{% if user.role == 'ADMIN' %}
                 <a href="{% url 'add_medicine' %}" 
                    class="mt-4 inline-block bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors">
                     Add Medicine
                 </a>
+                {% endif %}
             </div>
         {% endif %}
     </div>

@@ -1,4 +1,3 @@
-
 {% extends 'base.html' %}
 {% block title %}Member Dashboard{% endblock %}
 {% block content %}
@@ -75,17 +74,17 @@
                 <ul class="inline-flex space-x-2">
                     {% if supplies.has_previous %}
                     <li>
-                        <a href="?page={{ supplies.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Previous</a>
+                        <a href="?supplies_page={{ supplies.previous_page_number }}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}" class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Previous</a>
                     </li>
                     {% endif %}
                     {% for num in supplies.paginator.page_range %}
                     <li>
-                        <a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="{% if supplies.number == num %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-700{% endif %} px-3 py-2 rounded-md hover:bg-blue-500 hover:text-white">{{ num }}</a>
+                        <a href="?supplies_page={{ num }}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}" class="{% if supplies.number == num %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-700{% endif %} px-3 py-2 rounded-md hover:bg-blue-500 hover:text-white">{{ num }}</a>
                     </li>
                     {% endfor %}
                     {% if supplies.has_next %}
                     <li>
-                        <a href="?page={{ supplies.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Next</a>
+                        <a href="?supplies_page={{ supplies.next_page_number }}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}" class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Next</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -133,17 +132,17 @@
                 <ul class="inline-flex space-x-2">
                     {% if payments.has_previous %}
                     <li>
-                        <a href="?page={{ payments.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Previous</a>
+                        <a href="?payments_page={{ payments.previous_page_number }}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}" class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Previous</a>
                     </li>
                     {% endif %}
                     {% for num in payments.paginator.page_range %}
                     <li>
-                        <a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="{% if payments.number == num %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-700{% endif %} px-3 py-2 rounded-md hover:bg-blue-500 hover:text-white">{{ num }}</a>
+                        <a href="?payments_page={{ num }}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}" class="{% if payments.number == num %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-700{% endif %} px-3 py-2 rounded-md hover:bg-blue-500 hover:text-white">{{ num }}</a>
                     </li>
                     {% endfor %}
                     {% if payments.has_next %}
                     <li>
-                        <a href="?page={{ payments.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}" class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Next</a>
+                        <a href="?payments_page={{ payments.next_page_number }}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}" class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Next</a>
                     </li>
                     {% endif %}
                 </ul>
@@ -151,6 +150,26 @@
         </div>
         {% endif %}
     </div>
+
+    <!-- Medicine Requests Section -->
+    <div class="bg-white p-6 rounded-lg shadow-md mt-8">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-semibold text-gray-700">Recent Medicine Requests</h2>
+            <div class="flex gap-4 text-sm">
+                <a href="{% url 'medicine_list' %}" class="text-blue-600 hover:underline">Request Medicine</a>
+                <a href="{% url 'member_requests' %}" class="text-blue-600 hover:underline">View All</a>
+            </div>
+        </div>
+        <ul class="divide-y">
+            {% for medicine_request in medicine_requests %}
+            <li class="py-3 flex justify-between">
+                <span>{{ medicine_request.medicine.name }} &times; {{ medicine_request.quantity }}</span>
+                <span class="{% if medicine_request.status == 'FULFILLED' %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %} px-2 py-1 rounded-full text-sm">{{ medicine_request.get_status_display }}</span>
+            </li>
+            {% empty %}
+            <li class="py-3 text-gray-500">No medicine requests yet.</li>
+            {% endfor %}
+        </ul>
+    </div>
 </div>
 {% endblock %}
-```

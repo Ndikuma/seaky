@@ -4,33 +4,42 @@
 {% block content %}
 <div class="min-h-screen bg-gray-100 py-6 px-4">
     <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h1 class="text-2xl font-bold text-gray-800 mb-4">Medicine Requests</h1>
+        <div class="flex items-center justify-between mb-4">
+            <h1 class="text-2xl font-bold text-gray-800">Medicine Requests</h1>
+            <div class="flex gap-3 text-sm">
+                <a href="{% url 'medicine_request_list' %}" class="{% if not status %}font-semibold text-blue-700{% else %}text-blue-600 hover:underline{% endif %}">All</a>
+                <a href="?status=PENDING" class="{% if status == 'PENDING' %}font-semibold text-blue-700{% else %}text-blue-600 hover:underline{% endif %}">Pending</a>
+                <a href="?status=FULFILLED" class="{% if status == 'FULFILLED' %}font-semibold text-blue-700{% else %}text-blue-600 hover:underline{% endif %}">Fulfilled</a>
+            </div>
+        </div>
         <table class="min-w-full">
             <thead>
                 <tr class="bg-gray-100">
                     <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Member</th>
                     <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Medicine</th>
                     <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Quantity</th>
+                    <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Requested</th>
                     <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Status</th>
                     <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Actions</th>
                 </tr>
             </thead>
             <tbody>
-                {% for request in requests %}
+                {% for medicine_request in requests %}
                 <tr class="hover:bg-gray-50">
-                    <td class="px-4 py-2">{{ request.member }}</td>
-                    <td class="px-4 py-2">{{ request.medicine.name }}</td>
-                    <td class="px-4 py-2">{{ request.quantity }}</td>
-                    <td class="px-4 py-2">{{ request.get_status_display }}</td>
+                    <td class="px-4 py-2">{{ medicine_request.member }}</td>
+                    <td class="px-4 py-2">{{ medicine_request.medicine.name }}</td>
+                    <td class="px-4 py-2">{{ medicine_request.quantity }}</td>
+                    <td class="px-4 py-2">{{ medicine_request.request_date|date:"Y-m-d" }}</td>
+                    <td class="px-4 py-2">{{ medicine_request.get_status_display }}{% if medicine_request.status == 'FULFILLED' %} ({{ medicine_request.fulfilled_quantity }}){% endif %}</td>
                     <td class="px-4 py-2">
-                        {% if request.status == 'PENDING' %}
-                        <a href="{% url 'medicine_request_fulfill' request.pk %}" class="text-blue-600 hover:underline">Fulfill</a>
+                        {% if medicine_request.status == 'PENDING' %}
+                        <a href="{% url 'medicine_request_fulfill' medicine_request.pk %}" class="text-blue-600 hover:underline">Fulfill</a>
                         {% endif %}
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="px-4 py-2 text-center text-gray-500">No requests found.</td>
+                    <td colspan="6" class="px-4 py-2 text-center text-gray-500">No requests found.</td>
                 </tr>
                 {% endfor %}
             </tbody>

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Members{% endblock %}
+{% block content %}
+<div class="bg-white p-6 rounded-lg shadow-md">
+    <h1 class="text-2xl font-bold mb-6">Members</h1>
+    <div class="mb-4 flex flex-col sm:flex-row gap-4 sm:items-center sm:justify-between">
+        <a href="{% url 'member_create' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Member</a>
+        <form method="get" class="flex gap-2">
+            <input type="text" name="search" value="{{ search_query }}" placeholder="Search by name, username or ID" class="border border-gray-300 rounded-md px-3 py-2 w-64 focus:ring-blue-500 focus:border-blue-500">
+            <button type="submit" class="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300">Search</button>
+        </form>
+    </div>
+    <div class="overflow-x-auto">
+        <table class="min-w-full bg-white border rounded-lg">
+            <thead class="bg-gray-200">
+                <tr>
+                    <th class="py-3 px-4 border-b text-left">Member ID</th>
+                    <th class="py-3 px-4 border-b text-left">Name</th>
+                    <th class="py-3 px-4 border-b text-left">Username</th>
+                    <th class="py-3 px-4 border-b text-left">Role</th>
+                    <th class="py-3 px-4 border-b text-left">Cooperative</th>
+                    <th class="py-3 px-4 border-b text-left">Contact</th>
+                    <th class="py-3 px-4 border-b text-left">Joined</th>
+                    <th class="py-3 px-4 border-b text-left">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for member in members %}
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-4 border-b">{{ member.member_id }}</td>
+                    <td class="py-3 px-4 border-b">{{ member.full_name }}</td>
+                    <td class="py-3 px-4 border-b">{{ member.user.username }}</td>
+                    <td class="py-3 px-4 border-b">{{ member.user.get_role_display }}</td>
+                    <td class="py-3 px-4 border-b">{{ member.cooperative|default:"N/A" }}</td>
+                    <td class="py-3 px-4 border-b">{{ member.email|default:"" }}{% if member.email and member.contact_number %}<br>{% endif %}{{ member.contact_number }}</td>
+                    <td class="py-3 px-4 border-b">{{ member.joined_date|date:"Y-m-d" }}</td>
+                    <td class="py-3 px-4 border-b whitespace-nowrap">
+                        <a href="{% url 'member_update' member.pk %}" class="text-blue-600 hover:underline">Edit</a>
+                        {% if member.user_id != user.pk %}
+                        | <a href="{% url 'member_delete' member.pk %}" class="text-red-600 hover:underline">Delete</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr><td colspan="8" class="py-3 px-4 border-b text-center text-gray-500">No members found.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% if members.has_other_pages %}
+    <nav class="mt-4 flex justify-center gap-2" aria-label="Pagination">
+        {% if members.has_previous %}
+        <a href="?page={{ members.previous_page_number }}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}" class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Previous</a>
+        {% endif %}
+        <span class="px-3 py-2 text-gray-700">Page {{ members.number }} of {{ members.paginator.num_pages }}</span>
+        {% if members.has_next %}
+        <a href="?page={{ members.next_page_number }}{% if search_query %}&search={{ search_query|urlencode }}{% endif %}" class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Next</a>
+        {% endif %}
+    </nav>
+    {% endif %}
+</div>
+{% endblock %}

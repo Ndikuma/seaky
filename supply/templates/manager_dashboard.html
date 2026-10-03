@@ -1,17 +1,21 @@
 {% extends 'base.html' %}
 
-{% block title %}
-    <span data-lang="fr">Tableau de Bord du Gestionnaire</span>
-{% endblock %}
+{% block title %}Tableau de Bord du Gestionnaire{% endblock %}
 
 {% block content %}
 <div class="bg-gray-100 min-h-screen p-6">
     <div class="max-w-7xl mx-auto">
+        {% if not cooperative %}
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <h1 class="text-2xl font-bold text-gray-900 mb-2" data-lang="fr">Aucune coopérative assignée</h1>
+            <p class="text-gray-600" data-lang="fr">Votre compte n'est rattaché à aucune coopérative. Veuillez contacter un administrateur.</p>
+        </div>
+        {% else %}
         <h1 class="text-3xl font-bold mb-8 text-gray-900" data-lang="fr">Coopérative : {{ cooperative }}</h1>
 
         <!-- Cartes de statistiques -->
         {% if user.role == 'MANAGER' %}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-6 mb-8">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <!-- Carte : Nombre de membres -->
             <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in">
                 <h3 class="text-lg font-semibold text-gray-700" data-lang="fr">Nombre de Membres</h3>
@@ -24,11 +28,24 @@
                 <p class="text-3xl font-bold text-green-600 mt-2">{{ total_milk_liters|floatformat:2 }} L</p>
                 <p class="text-sm text-gray-500 mt-1" data-lang="fr">Quantité totale collectée</p>
             </div>
+            <!-- Carte : Paiements effectués -->
+            <div class="bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in">
+                <h3 class="text-lg font-semibold text-gray-700" data-lang="fr">Paiements Effectués</h3>
+                <p class="text-3xl font-bold text-emerald-600 mt-2">${{ total_payments|floatformat:2 }}</p>
+                <p class="text-sm text-gray-500 mt-1" data-lang="fr">Total des paiements marqués payés</p>
+            </div>
+            <!-- Carte : Demandes de médicaments -->
+            <a href="{% url 'medicine_request_list' %}?status=PENDING" class="block bg-white p-6 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 animate-fade-in">
+                <h3 class="text-lg font-semibold text-gray-700" data-lang="fr">Demandes en Attente</h3>
+                <p class="text-3xl font-bold text-orange-600 mt-2">{{ pending_requests }}</p>
+                <p class="text-sm text-gray-500 mt-1" data-lang="fr">Demandes de médicaments à traiter</p>
+            </a>
 
         </div>
 
         <!-- Actions du gestionnaire -->
         <div class="mb-8 flex flex-wrap gap-4">
+            <a href="{% url 'member_list' %}" class="inline-block bg-gray-700 text-white px-4 py-2 rounded-md hover:bg-gray-800 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-transform hover:scale-105" data-lang="fr">Voir les Membres</a>
             <a href="{% url 'member_create' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-transform hover:scale-105" data-lang="fr">Ajouter un Membre</a>
             <button type="button" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:ring-2 focus:ring-blue-500 focus:outline-none transition-transform hover:scale-105" onclick="document.getElementById('milk-supply-modal').classList.remove('hidden')" data-lang="fr">Ajouter une Fourniture de Lait</button>
             <a href="{% url 'payment_create' %}" class="inline-block bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-transform hover:scale-105" data-lang="fr">Traiter un Paiement</a>
@@ -42,7 +59,7 @@
                     {% csrf_token %}
                     <div class="mb-4">
                         <label for="member_id" class="block text-sm font-medium text-gray-700" data-lang="fr">ID Membre</label>
-                        <input type="text" id="member_id" name="member_id" placeholder="Entrez l'ID du membre (ex: COO-12345678)" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500" required aria-describedby="member_id-error">
+                        <input type="text" id="member_id" name="member_id" placeholder="Entrez l'ID du membre (ex: 100001)" inputmode="numeric" autocomplete="off" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500" required aria-describedby="member_id-error">
                         <p id="member_id-error" class="hidden text-red-600 text-sm mt-1" data-lang="fr">ID membre invalide ou non trouvé.</p>
                         <div id="member-details" class="mt-2 text-sm text-gray-900 hidden">
                             <p id="member-name" data-lang="fr"></p>
@@ -51,12 +68,12 @@
                     </div>
                     <div class="mb-4">
                         <label for="supply_date" class="block text-sm font-medium text-gray-700" data-lang="fr">Date de Fourniture</label>
-                        <input type="date" id="supply_date" name="supply_date" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500" required aria-describedby="supply_date-error">
+                        <input type="date" id="supply_date" name="supply_date" value="{% now 'Y-m-d' %}" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500" required aria-describedby="supply_date-error">
                         <p id="supply_date-error" class="hidden text-red-600 text-sm mt-1" data-lang="fr">Veuillez entrer une date valide.</p>
                     </div>
                     <div class="mb-4">
                         <label for="quantity_liters" class="block text-sm font-medium text-gray-700" data-lang="fr">Quantité (Litres)</label>
-                        <input type="number" id="quantity_liters" name="quantity_liters" min="0.1" step="0.1" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500" required aria-describedby="quantity_liters-error">
+                        <input type="number" id="quantity_liters" name="quantity_liters" min="0.01" step="0.01" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500" required aria-describedby="quantity_liters-error">
                         <p id="quantity_liters-error" class="hidden text-red-600 text-sm mt-1" data-lang="fr">Veuillez entrer une quantité valide.</p>
                     </div>
                     <div class="mb-4">
@@ -68,6 +85,11 @@
                             <option value="C">C</option>
                         </select>
                         <p id="quality_grade-error" class="hidden text-red-600 text-sm mt-1" data-lang="fr">Veuillez sélectionner une qualité.</p>
+                    </div>
+                    <div class="mb-4">
+                        <label for="price_per_liter" class="block text-sm font-medium text-gray-700" data-lang="fr">Prix par Litre ($) <span class="text-gray-400">(optionnel)</span></label>
+                        <input type="number" id="price_per_liter" name="price_per_liter" min="0.01" step="0.01" placeholder="Par défaut : A 1.50 · B 1.20 · C 0.90" class="mt-1 block w-full border border-gray-300 rounded-md p-2 focus:ring-blue-500 focus:border-blue-500" aria-describedby="price_per_liter-error">
+                        <p id="price_per_liter-error" class="hidden text-red-600 text-sm mt-1" data-lang="fr">Veuillez entrer un prix valide.</p>
                     </div>
 
                     <div class="flex justify-end gap-4">
@@ -180,6 +202,7 @@
                 </table>
             </div>
         </div>
+        {% endif %}
     </div>
 </div>
 
@@ -202,11 +225,7 @@
 
                 if (member_id) {
                     try {
-                        const response = await fetch(`/api/validate-member/${member_id}/`, {
-                            headers: {
-                                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                            }
-                        });
+                        const response = await fetch(`/api/validate-member/${encodeURIComponent(member_id)}/`);
                         const data = await response.json();
                         if (response.ok && data.valid) {
                             memberName.textContent = `Nom: ${data.member.full_name || 'Non défini'}`;
@@ -252,7 +271,7 @@
                     document.getElementById('quality_grade-error').classList.remove('hidden');
                     isValid = false;
                 }
-                if (!pricePerLiter.value || pricePerLiter.value <= 0) {
+                if (pricePerLiter.value && pricePerLiter.value <= 0) {
                     document.getElementById('price_per_liter-error').classList.remove('hidden');
                     isValid = false;
                 }
@@ -261,9 +280,7 @@
                     submitButton.disabled = true;
                     submitText.classList.add('hidden');
                     loadingSpinner.classList.remove('hidden');
-                    setTimeout(() => {
-                        milkSupplyForm.submit();
-                    }, 1000);
+                    milkSupplyForm.submit();
                 }
             });
         }

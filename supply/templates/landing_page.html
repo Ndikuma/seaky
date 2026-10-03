@@ -91,12 +91,12 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for medicine in medicines|slice:":3" %}
                 <div class="bg-white rounded-xl shadow-lg p-6 text-center animate-fade-in">
-                    <img src="{% if medicine.image %}{{ medicine.image.url }}{% else %}/static/images/default-medicine.jpg{% endif %}" alt="{{ medicine.name }} product image" class="w-full h-40 object-cover rounded-md mb-4" loading="lazy">
+                    <img src="{% if medicine.image_url %}{{ medicine.image_url.url }}{% else %}/static/images/download.jpeg{% endif %}" alt="{{ medicine.name }} product image" class="w-full h-40 object-cover rounded-md mb-4" loading="lazy">
                     <h3 class="text-xl font-semibold text-gray-900">{{ medicine.name }}</h3>
                     <p class="text-gray-600">{{ medicine.description|truncatewords:20 }}</p>
                     {% if user.is_authenticated and user.role == 'MEMBER' %}
-                        <a href="{% url 'medicine_request_create' %}?medicine={{ medicine.id }}" class="mt-4 inline-block text-sm font-semibold text-blue-600 hover:underline" data-lang="fr">Demander ce produit</a>
-                        <a href="{% url 'medicine_request_create' %}?medicine={{ medicine.id }}" class="mt-4 inline-block text-sm font-semibold text-blue-600 hover:underline" data-lang="en" hidden>Request This Product</a>
+                        <a href="{% url 'request_medicine' medicine.id %}" class="mt-4 inline-block text-sm font-semibold text-blue-600 hover:underline" data-lang="fr">Demander ce produit</a>
+                        <a href="{% url 'request_medicine' medicine.id %}" class="mt-4 inline-block text-sm font-semibold text-blue-600 hover:underline" data-lang="en" hidden>Request This Product</a>
                     {% else %}
                         <a href="{% url 'medicine_list' %}" class="mt-4 inline-block text-sm font-semibold text-blue-600 hover:underline" data-lang="fr">Voir plus</a>
                         <a href="{% url 'medicine_list' %}" class="mt-4 inline-block text-sm font-semibold text-blue-600 hover:underline" data-lang="en" hidden>View More</a>
