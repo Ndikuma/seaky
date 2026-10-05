@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% block title %}My Medicine Requests{% endblock %}
+{% block content %}
+<div class="min-h-screen bg-gray-100 py-6 px-4">
+    <div class="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        <div class="flex items-center justify-between mb-4">
+            <h1 class="text-2xl font-bold text-gray-800">My Medicine Requests</h1>
+            <a href="{% url 'medicine_list' %}" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">Request Medicine</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="min-w-full">
+                <thead>
+                    <tr class="bg-gray-100">
+                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Medicine</th>
+                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Quantity</th>
+                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Requested</th>
+                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Status</th>
+                        <th class="px-4 py-2 text-left text-sm font-medium text-gray-700">Fulfilled</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for medicine_request in requests %}
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-2">{{ medicine_request.medicine.name }}</td>
+                        <td class="px-4 py-2">{{ medicine_request.quantity }}</td>
+                        <td class="px-4 py-2">{{ medicine_request.request_date|date:"Y-m-d H:i" }}</td>
+                        <td class="px-4 py-2">
+                            <span class="{% if medicine_request.status == 'FULFILLED' %}bg-green-100 text-green-800{% else %}bg-yellow-100 text-yellow-800{% endif %} px-2 py-1 rounded-full text-sm">{{ medicine_request.get_status_display }}</span>
+                        </td>
+                        <td class="px-4 py-2">
+                            {% if medicine_request.status == 'FULFILLED' %}
+                                {{ medicine_request.fulfilled_quantity }} on {{ medicine_request.fulfilled_date|date:"Y-m-d" }}
+                            {% else %}&mdash;{% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="px-4 py-2 text-center text-gray-500">You have not requested any medicine yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -32,7 +32,7 @@
         <div class="mb-8">
             <h2 class="text-lg font-semibold text-gray-700 mb-3">Medicine Details</h2>
             <div class="flex items-center">
-                <img src="{% if selected_medicine.image_url %}{{ selected_medicine.image_url.url }}{% else %}/static/images/default-medicine.jpg{% endif %}" 
+                <img src="{% if selected_medicine.image_url %}{{ selected_medicine.image_url.url }}{% else %}/static/images/download.jpeg{% endif %}" 
                      alt="{{ selected_medicine.name|default:'Medicine' }}" 
                      class="w-24 h-24 object-cover rounded-md mr-4">
                 <div>

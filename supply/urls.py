@@ -38,10 +38,15 @@ urlpatterns = [
     path('payments/<int:pk>/delete/', views.payment_delete, name='payment_delete'),
     
     
+    # Medicine routes
     path('medicine/', views.medicine_list, name='medicine_list'),
+    path('medicine/add/', views.add_medicine, name='add_medicine'),
     path('request-medicine/<int:medicine_id>/', views.request_medicine, name='request_medicine'),
+    path('medicine/my-requests/', views.member_requests, name='member_requests'),
     path('medicine/requests/', views.medicine_request_list, name='medicine_request_list'),
     path('medicine/requests/<int:pk>/fulfill/', views.medicine_request_fulfill, name='medicine_request_fulfill'),
-    path("api/validate-member/<str:member_id>/",views.validate_member),
+
+    # API
+    path('api/validate-member/<str:member_id>/', views.validate_member, name='validate_member'),
 
 ]

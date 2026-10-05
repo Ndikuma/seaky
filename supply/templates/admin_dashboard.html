@@ -3,11 +3,18 @@
 {% block content %}
 <div class="bg-white p-6 rounded-lg shadow-md">
     <h1 class="text-2xl font-bold mb-6">Admin Dashboard</h1>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <div class="p-4 rounded-lg bg-blue-50"><p class="text-sm text-gray-600">Cooperatives / Members</p><p class="text-2xl font-bold text-blue-700">{{ cooperatives|length }} / {{ members|length }}</p></div>
+        <div class="p-4 rounded-lg bg-green-50"><p class="text-sm text-gray-600">Total Milk Collected</p><p class="text-2xl font-bold text-green-700">{{ total_milk_liters|floatformat:2 }} L</p></div>
+        <div class="p-4 rounded-lg bg-emerald-50"><p class="text-sm text-gray-600">Total Paid</p><p class="text-2xl font-bold text-emerald-700">${{ total_paid|floatformat:2 }}</p></div>
+        <a href="{% url 'medicine_request_list' %}?status=PENDING" class="block p-4 rounded-lg bg-orange-50 hover:bg-orange-100"><p class="text-sm text-gray-600">Pending Medicine Requests</p><p class="text-2xl font-bold text-orange-700">{{ pending_requests }}</p></a>
+    </div>
     <div class="mb-4 space-x-2">
         <a href="{% url 'cooperative_create' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Cooperative</a>
         <a href="{% url 'member_create' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Member</a>
         <a href="{% url 'milk_supply_create' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Milk Supply</a>
         <a href="{% url 'payment_create' %}" class="inline-block bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Process Payment</a>
+        <a href="{% url 'add_medicine' %}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Add Medicine</a>
     </div>
 
     <h2 class="text-xl font-semibold mt-6 mb-2">Cooperatives</h2>

@@ -3,9 +3,6 @@ from django.utils import timezone
 from django.contrib.auth.models import AbstractUser
 from django.core.mail import send_mail
 from django.core.validators import MinValueValidator
-import re
-import random
-import string
 # Custom User Model
 class User(AbstractUser):
     ROLE_CHOICES = [
@@ -17,6 +14,12 @@ class User(AbstractUser):
 
     def __str__(self):
         return f"{self.username} ({self.get_role_display()})"
+
+    def save(self, *args, **kwargs):
+        # Accounts created with `createsuperuser` should land on the admin dashboard.
+        if self._state.adding and self.is_superuser and self.role == 'MEMBER':
+            self.role = 'ADMIN'
+        super().save(*args, **kwargs)
 
 # Cooperative Model
 class Cooperative(models.Model):
@@ -39,13 +42,17 @@ class Member(models.Model):
     cooperative = models.ForeignKey(Cooperative, on_delete=models.SET_NULL, null=True, blank=True, related_name="members")
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
-    member_id = models.IntegerField(max_length=20, unique=True)
+    member_id = models.IntegerField(unique=True, editable=False)
     contact_number = models.CharField(max_length=15, blank=True)
     email = models.EmailField(blank=True, null=True)
     joined_date = models.DateField(default=timezone.now)
 
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.member_id})"
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}".strip()
 
     def save(self, *args, **kwargs):
         if not self.member_id:
@@ -149,7 +156,6 @@ class Payment(models.Model):
             models.Index(fields=['status']),
         ]
 
-from django.db import models
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 
@@ -160,7 +166,7 @@ class Medicine(models.Model):
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(
         max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)],
-        default=0.0
+        default=0.01
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -196,6 +202,7 @@ class MedicineRequest(models.Model):
     fulfilled_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
 
     class Meta:
+        ordering = ['-request_date']
         verbose_name = _("Medicine Request")
         verbose_name_plural = _("Medicine Requests")
 
@@ -212,7 +219,7 @@ class MedicineRequest(models.Model):
         self.status = 'FULFILLED'
         self.fulfilled_quantity = quantity
         self.fulfilled_by = fulfilled_by
-        self.fulfilled_date = models.functions.Now()
+        self.fulfilled_date = timezone.now()
         self.medicine.reduce_stock(quantity)
         self.save()
         return f"Fulfilled {quantity} units of {self.medicine.name} for {self.member}."
